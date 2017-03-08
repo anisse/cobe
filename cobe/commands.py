@@ -115,10 +115,10 @@ class LearnIrcLogCommand:
         subparser.add_argument("-r", "--reply-to", action="append",
                                help="Reply (invisibly) to things said "
                                "to specified nick")
-        subparser.add_argument("-f", "--format", choices=["irssi",],
+        subparser.add_argument("-f", "--format", choices=["irssi", "weechat"],
                                default="irssi",
                                help="Log format. Currently only irssi (default)"
-                               "is supported")
+                               " and weechat logs are supported")
         subparser.add_argument("file", nargs="+")
         subparser.set_defaults(run=cls.run)
 
@@ -168,6 +168,7 @@ class LearnIrcLogCommand:
     def _parse_irc_message(msg, ignored_nicks=None, only_nicks=None, logformat="irssi"):
         formats = {
                 "irssi": "\d+:\d+\s+<(?P<nick>.+?)>\s+(?P<msg>.*)",
+                "weechat": "\d+-\d+-\d+ \d+:\d+:\d+\s+(?!<?-->?)(?P<nick>.+?)\s+(?P<msg>.*)",
                 }
 
         match = re.match(formats[logformat], msg)
