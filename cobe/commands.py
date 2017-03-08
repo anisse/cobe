@@ -115,6 +115,10 @@ class LearnIrcLogCommand:
         subparser.add_argument("-r", "--reply-to", action="append",
                                help="Reply (invisibly) to things said "
                                "to specified nick")
+        subparser.add_argument("-f", "--format", choices=["irssi",],
+                               default="irssi",
+                               help="Log format. Currently only irssi (default)"
+                               "is supported")
         subparser.add_argument("file", nargs="+")
         subparser.set_defaults(run=cls.run)
 
@@ -144,7 +148,8 @@ class LearnIrcLogCommand:
 
                 parsed = cls._parse_irc_message(line.strip(),
                                                 args.ignored_nicks,
-                                                args.only_nicks)
+                                                args.only_nicks,
+                                                args.format)
                 if parsed is None:
                     continue
 
@@ -160,14 +165,17 @@ class LearnIrcLogCommand:
         b.stop_batch_learning()
 
     @staticmethod
-    def _parse_irc_message(msg, ignored_nicks=None, only_nicks=None):
-        # only match lines of the form "HH:MM <nick> message"
-        match = re.match("\d+:\d+\s+<(.+?)>\s+(.*)", msg)
+    def _parse_irc_message(msg, ignored_nicks=None, only_nicks=None, logformat="irssi"):
+        formats = {
+                "irssi": "\d+:\d+\s+<(?P<nick>.+?)>\s+(?P<msg>.*)",
+                }
+
+        match = re.match(formats[logformat], msg)
         if not match:
             return None
 
-        nick = match.group(1)
-        msg = match.group(2)
+        nick = match.group('nick')
+        msg = match.group('msg')
 
         if ignored_nicks is not None and nick in ignored_nicks:
             return None
