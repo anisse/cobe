@@ -3,6 +3,7 @@
 import irc.bot
 import logging
 import re
+import jaraco.stream.buffer
 
 log = logging.getLogger("cobe.bot")
 
@@ -13,7 +14,7 @@ class Bot(irc.bot.SingleServerIRCBot):
         irc.bot.SingleServerIRCBot.__init__(self, servers, nickname=nick, realname=nick)
 
         # Fall back to latin-1 if invalid utf-8 is provided.
-        irc.client.ServerConnection.buffer_class = irc.buffer.LenientDecodingLineBuffer
+        irc.client.ServerConnection.buffer_class = jaraco.stream.buffer.LenientDecodingLineBuffer
 
         self.brain = brain
         self.nick = nick
@@ -33,7 +34,7 @@ class Bot(irc.bot.SingleServerIRCBot):
         log.debug("on_%s %s", e.type, (e.source, e.target, e.arguments))
         irc.client.SimpleIRCClient._dispatcher(self, c, e)
 
-    def on_endofmotd(self, conn, event):
+    def on_welcome(self, conn, event):
         self.connection.join(self.channel)
 
         if self.log_channel:

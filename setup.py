@@ -18,7 +18,7 @@ setup(
     install_requires = [
         "Cython==0.29.17",
         "PyStemmer==2.0.0.1",
-        "irc==18.0.0"
+        "irc==19.0.1"
         ],
 
     classifiers = [
