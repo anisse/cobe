@@ -34,6 +34,9 @@ class Bot(irc.bot.SingleServerIRCBot):
         log.debug("on_%s %s", e.type, (e.source, e.target, e.arguments))
         irc.client.SimpleIRCClient._dispatcher(self, c, e)
 
+    def on_nicknameinuse(self, c, e):
+        c.nick(c.get_nickname() + "_")
+
     def on_welcome(self, conn, event):
         self.connection.join(self.channel)
 
