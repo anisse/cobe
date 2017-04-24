@@ -3,6 +3,7 @@
 import irc.bot
 import logging
 import re
+import functools
 import jaraco.stream.buffer
 
 log = logging.getLogger("cobe.bot")
@@ -22,6 +23,7 @@ class Bot(irc.bot.SingleServerIRCBot):
         self.log_channel = log_channel
         self.ignored_nicks = ignored_nicks
         self.only_nicks = only_nicks
+        self.keepalive_running = False
 
         if log_channel is not None:
             # set up a new logger
@@ -37,8 +39,22 @@ class Bot(irc.bot.SingleServerIRCBot):
     def on_nicknameinuse(self, c, e):
         c.nick(c.get_nickname() + "_")
 
+    def keep_alive(self):
+        try:
+            if self.connection.connected:
+                self.connection.ping('keep-alive')
+        except BaseException as e:
+            # The keep-alive might be racy with a disconnection, and we don't
+            # need it to bring down the program
+            log.error("Exception while sending keepalive: %s", e)
+            pass
+
     def on_welcome(self, conn, event):
         self.connection.join(self.channel)
+        if not self.keepalive_running:
+            keeper = functools.partial(self.keep_alive)
+            self.connection.reactor.scheduler.execute_every(period=30, func=keeper)
+            self.keepalive_running = True
 
         if self.log_channel:
             self.connection.join(self.log_channel)
