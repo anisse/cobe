@@ -104,7 +104,10 @@ class Bot(irc.bot.SingleServerIRCBot):
 
 class Runner:
     def run(self, brain, args):
-        servers = [ irc.bot.ServerSpec(args.server, port=args.port), ]
+        if len(args.password) > 0:
+            servers = [ irc.bot.ServerSpec(args.server, port=args.port, password=args.password), ]
+        else:
+            servers = [ irc.bot.ServerSpec(args.server, port=args.port), ]
         bot = Bot(brain, servers, args.nick, args.channel, args.log_channel,
                   args.ignored_nicks, args.only_nicks)
         log.info("connected to %s:%s", args.server, args.port)

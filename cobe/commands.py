@@ -236,6 +236,8 @@ class IrcClientCommand:
                                help="IRC server hostname")
         subparser.add_argument("-p", "--port", type=int, default=6667,
                                help="IRC server port")
+        subparser.add_argument("-k", "--password", required=False,
+                               help="IRC server password")
         subparser.add_argument("-n", "--nick", default="cobe",
                                help="IRC nick")
         subparser.add_argument("-c", "--channel", required=True,
