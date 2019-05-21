@@ -97,7 +97,7 @@ class Bot(irc.bot.SingleServerIRCBot):
         if not self.only_nicks or user in self.only_nicks:
             self.brain.learn(text)
 
-        if to == conn.nickname:
+        if to == conn.get_nickname():
             reply = self.brain.reply(text)
             conn.privmsg(event.target, "%s: %s" % (user, reply))
 
