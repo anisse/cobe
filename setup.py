@@ -15,6 +15,7 @@ setup(
     packages = ["cobe"],
     test_suite = "tests",
 
+    setup_requires = [ "cython" ],
     install_requires = [
         "Cython==0.29.17",
         "PyStemmer==2.0.0.1",
